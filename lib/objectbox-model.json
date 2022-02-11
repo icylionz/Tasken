@@ -1,0 +1,329 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3047119722248943766",
+      "lastPropertyId": "6:8351653536856652094",
+      "name": "Client",
+      "properties": [
+        {
+          "id": "1:6666439623238722583",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5885434550031188601",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:7568388254166302247",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "4:5669669507363594565",
+          "name": "phone",
+          "type": 9
+        },
+        {
+          "id": "5:4574341189092651383",
+          "name": "address",
+          "type": 9
+        },
+        {
+          "id": "6:8351653536856652094",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:2434925613074365961",
+      "lastPropertyId": "5:7669544656971839470",
+      "name": "Invoice",
+      "properties": [
+        {
+          "id": "1:5648412560593767770",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5460616467354941037",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:784123438425232573",
+          "name": "dateCreated",
+          "type": 10
+        },
+        {
+          "id": "4:3934035022134927373",
+          "name": "currency",
+          "type": 9
+        },
+        {
+          "id": "5:7669544656971839470",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:7247280016017454583",
+      "lastPropertyId": "3:5833523288266218998",
+      "name": "InvoiceStatus",
+      "properties": [
+        {
+          "id": "1:7753900110074521879",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7613966250902543905",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:5833523288266218998",
+          "name": "description",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:4045841196960031846",
+      "lastPropertyId": "9:645103681014307083",
+      "name": "Job",
+      "properties": [
+        {
+          "id": "1:4854873106509749263",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7329276810451639576",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:5511753860427624228",
+          "name": "rate",
+          "type": 8
+        },
+        {
+          "id": "4:5364922205256740347",
+          "name": "flatRate",
+          "type": 8
+        },
+        {
+          "id": "5:4222502452414597461",
+          "name": "useFlatRate",
+          "type": 1
+        },
+        {
+          "id": "6:8192132578268870020",
+          "name": "dateCreated",
+          "type": 10
+        },
+        {
+          "id": "7:7111198205983427611",
+          "name": "inactivityTimeoutPeriod",
+          "type": 6
+        },
+        {
+          "id": "8:2798265017849302634",
+          "name": "timerLocked",
+          "type": 1
+        },
+        {
+          "id": "9:645103681014307083",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:1205134986999380430",
+      "lastPropertyId": "3:597086813575911437",
+      "name": "JobStatus",
+      "properties": [
+        {
+          "id": "1:6951170827621602097",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1730687592718256597",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:597086813575911437",
+          "name": "description",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:1453192878401859917",
+      "lastPropertyId": "5:8368507026526201619",
+      "name": "JobType",
+      "properties": [
+        {
+          "id": "1:1856947763065992056",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3806298865076403867",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:8116216442510607606",
+          "name": "defaultRate",
+          "type": 8
+        },
+        {
+          "id": "4:4814155743765217491",
+          "name": "defaultFlatRate",
+          "type": 8
+        },
+        {
+          "id": "5:8368507026526201619",
+          "name": "description",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:3908022631849986367",
+      "lastPropertyId": "5:5349056700944519172",
+      "name": "Report",
+      "properties": [
+        {
+          "id": "1:526047962361403851",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8191283473142426512",
+          "name": "dateCreated",
+          "type": 10
+        },
+        {
+          "id": "3:7793904596824342265",
+          "name": "minDateAccountFor",
+          "type": 10
+        },
+        {
+          "id": "4:5413324979817964920",
+          "name": "maxDateAccountFor",
+          "type": 10
+        },
+        {
+          "id": "5:5349056700944519172",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "8:2492670077546611593",
+      "lastPropertyId": "6:8022730470555067751",
+      "name": "Representative",
+      "properties": [
+        {
+          "id": "1:8003218622436098541",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8722710826678417386",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3072678881938291362",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "4:2215115425440012994",
+          "name": "phone",
+          "type": 9
+        },
+        {
+          "id": "5:613531346404062273",
+          "name": "notes",
+          "type": 9
+        },
+        {
+          "id": "6:8022730470555067751",
+          "name": "address",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:1886637008793834148",
+      "lastPropertyId": "4:4835807742693286886",
+      "name": "Session",
+      "properties": [
+        {
+          "id": "1:3844971630247733380",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5137654988597520260",
+          "name": "timeElapsed",
+          "type": 6
+        },
+        {
+          "id": "3:4826622505502710800",
+          "name": "dateTimeEnded",
+          "type": 10
+        },
+        {
+          "id": "4:4835807742693286886",
+          "name": "dateTimeStarted",
+          "type": 10
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "9:1886637008793834148",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

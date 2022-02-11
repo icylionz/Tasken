@@ -1,0 +1,191 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'models.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Invoice _$InvoiceFromJson(Map<String, dynamic> json) =>
+    Invoice(invoiceStatusID: json['invoice_status_id'])
+      ..id = json['id'] as int?
+      ..name = json['name'] as String?
+      ..dateCreated = json['dateCreated'] == null
+          ? null
+          : DateTime.parse(json['dateCreated'] as String)
+      ..currency = json['currency'] as String?
+      ..notes = json['notes'] as String?;
+
+Map<String, dynamic> _$InvoiceToJson(Invoice instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'dateCreated': instance.dateCreated?.toIso8601String(),
+      'currency': instance.currency,
+      'status': instance.status,
+      'jobs': instance.jobs,
+      'notes': instance.notes,
+    };
+
+InvoiceStatus _$InvoiceStatusFromJson(Map<String, dynamic> json) =>
+    InvoiceStatus(
+      id: json['id'] as int?,
+    )
+      ..name = json['name'] as String?
+      ..description = json['description'] as String?;
+
+Map<String, dynamic> _$InvoiceStatusToJson(InvoiceStatus instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+    };
+
+Report _$ReportFromJson(Map<String, dynamic> json) => Report()
+  ..id = json['id'] as int?
+  ..dateCreated = json['dateCreated'] == null
+      ? null
+      : DateTime.parse(json['dateCreated'] as String)
+  ..minDateAccountFor = json['minDateAccountFor'] == null
+      ? null
+      : DateTime.parse(json['minDateAccountFor'] as String)
+  ..maxDateAccountFor = json['maxDateAccountFor'] == null
+      ? null
+      : DateTime.parse(json['maxDateAccountFor'] as String)
+  ..notes = json['notes'] as String?;
+Map<String, dynamic> _$ReportToJson(Report instance) => <String, dynamic>{
+      'id': instance.id,
+      'dateCreated': instance.dateCreated?.toIso8601String(),
+      'minDateAccountFor': instance.minDateAccountFor?.toIso8601String(),
+      'maxDateAccountFor': instance.maxDateAccountFor?.toIso8601String(),
+      'notes': instance.notes,
+      'jobs': instance.jobs,
+    };
+
+JobStatus _$JobStatusFromJson(Map<String, dynamic> json) => JobStatus(
+      id: json['id'] as int?,
+    )
+      ..name = json['name'] as String?
+      ..description = json['description'] as String?;
+
+Map<String, dynamic> _$JobStatusToJson(JobStatus instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+    };
+
+Job _$JobFromJson(Map<String, dynamic> json) => Job(
+    id: json['id'] as int?,
+    name: json['name'] as String?,
+    rate: (json['rate'] as num?)?.toDouble(),
+    flatRate: (json['flatRate'] as num?)?.toDouble(),
+    useFlatRate: json['useFlatRate'] as bool? ?? false,
+    dateCreated: json['dateCreated'] == null
+        ? null
+        : DateTime.parse(json['dateCreated'] as String),
+    inactivityTimeoutPeriod: json['inactivityTimeoutPeriod'] as int?,
+    timerLocked: json['timerLocked'] as bool? ?? false,
+    notes: json['notes'] as String?,
+    clientID: json['clientID'],
+    assignedRepresentativeID: json['assignedRepresentativeID'],
+    jobStatusID: json['statusID'],
+    jobTypeID: json['jobTypeID']);
+
+Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'rate': instance.rate,
+      'flatRate': instance.flatRate,
+      'useFlatRate': instance.useFlatRate,
+      'dateCreated': instance.dateCreated?.toIso8601String(),
+      'inactivityTimeoutPeriod': instance.inactivityTimeoutPeriod,
+      'timerLocked': instance.timerLocked,
+      'client': instance.client,
+      'status': instance.status,
+      'type': instance.type,
+      'assignedRepresentative': instance.assignedRepresentative,
+      'notes': instance.notes,
+      'sessions': instance.sessions,
+    };
+
+Session _$SessionFromJson(Map<String, dynamic> json) => Session(
+      id: json['id'] as int?,
+    )
+      ..job = json['job'] == null
+          ? null
+          : Job.fromJson(json['job'] as Map<String, dynamic>)
+      ..timeElapsed = json['timeElapsed'] as int?
+      ..dateTimeEnded = json['dateTimeEnded'] == null
+          ? null
+          : DateTime.parse(json['dateTimeEnded'] as String)
+      ..dateTimeStarted = json['dateTimeStarted'] == null
+          ? null
+          : DateTime.parse(json['dateTimeStarted'] as String);
+
+Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
+      'id': instance.id,
+      'job': instance.job,
+      'timeElapsed': instance.timeElapsed,
+      'dateTimeEnded': instance.dateTimeEnded?.toIso8601String(),
+      'dateTimeStarted': instance.dateTimeStarted?.toIso8601String(),
+    };
+
+JobType _$JobTypeFromJson(Map<String, dynamic> json) => JobType(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      defaultFlatRate: (json['defaultFlatRate'] as num?)?.toDouble(),
+      defaultRate: (json['defaultRate'] as num?)?.toDouble(),
+      description: json['description'] as String?,
+    );
+
+Map<String, dynamic> _$JobTypeToJson(JobType instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'defaultRate': instance.defaultRate,
+      'defaultFlatRate': instance.defaultFlatRate,
+      'description': instance.description,
+    };
+
+Client _$ClientFromJson(Map<String, dynamic> json) => Client(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      address: json['address'] as String?,
+    )
+      ..representatives = (json['representatives'] as List<dynamic>)
+          .map((e) => Representative.fromJson(e as Map<String, dynamic>))
+          .toList()
+      ..notes = json['notes'] as String?;
+
+Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'email': instance.email,
+      'phone': instance.phone,
+      'address': instance.address,
+      'representatives': instance.representatives,
+      'notes': instance.notes,
+    };
+
+Representative _$RepresentativeFromJson(Map<String, dynamic> json) =>
+    Representative(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      notes: json['notes'] as String?,
+      address: json['address'] as String?,
+    )..client = json['client'] == null
+        ? null
+        : Client.fromJson(json['client'] as Map<String, dynamic>);
+
+Map<String, dynamic> _$RepresentativeToJson(Representative instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'client': instance.client,
+      'name': instance.name,
+      'email': instance.email,
+      'phone': instance.phone,
+      'notes': instance.notes,
+      'address': instance.address,
+    };
