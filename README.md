@@ -7,3 +7,4 @@ This is a time-tracking application that records the amount of time spent on a c
 - Logging
 - Client tracking
 - Job tracking
+- Inactivity Timeout

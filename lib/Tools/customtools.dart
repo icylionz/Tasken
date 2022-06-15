@@ -3,9 +3,9 @@ import 'package:path/path.dart' as path;
 import 'dart:ffi' as ffi;
 
 import 'package:tasken/Tools/generated_bindings.dart';
+import 'package:tasken/objectbox.g.dart' as ob;
 
 class CustomStopwatch extends Stopwatch {
-
   int initialMilliseconds;
   CustomStopwatch({this.initialMilliseconds = 0});
   int get totalMilliseconds => initialMilliseconds + elapsedMilliseconds;
@@ -34,7 +34,6 @@ class CustomSystemTools {
     return OSInterFaceLibrary(dylib).sysIdleTime;
   }
 }
-
 class DynamicLibraryException implements Exception {
   final String message;
   final String attemptedPath;
@@ -55,13 +54,14 @@ class TimerException implements Exception {
 }
 
 class Filter {
-  String criteriaName;
-  MathSign condition;
-  String parameter;
+  late ob.Condition<Object> condition;
+  dynamic orderBy;
+  int order = 0;
 
-  Filter(this.criteriaName, this.condition, this.parameter);
-
-
+  Filter(
+      {required ob.Condition<Object> condition,
+      dynamic orderBy,
+      int order = 0});
 }
 
 enum MathSign {
@@ -71,4 +71,5 @@ enum MathSign {
   lessThanAndEqual,
   moreThanAndEqual,
   notEqual,
-  contains}
+  contains
+}

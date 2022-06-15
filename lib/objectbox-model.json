@@ -44,7 +44,7 @@
     },
     {
       "id": "2:2434925613074365961",
-      "lastPropertyId": "5:7669544656971839470",
+      "lastPropertyId": "6:6477301370766781248",
       "name": "Invoice",
       "properties": [
         {
@@ -72,6 +72,11 @@
           "id": "5:7669544656971839470",
           "name": "notes",
           "type": 9
+        },
+        {
+          "id": "6:6477301370766781248",
+          "name": "taxRate",
+          "type": 8
         }
       ],
       "relations": []
@@ -102,7 +107,7 @@
     },
     {
       "id": "4:4045841196960031846",
-      "lastPropertyId": "9:645103681014307083",
+      "lastPropertyId": "10:5735851305704620955",
       "name": "Job",
       "properties": [
         {
@@ -150,6 +155,11 @@
           "id": "9:645103681014307083",
           "name": "notes",
           "type": 9
+        },
+        {
+          "id": "10:5735851305704620955",
+          "name": "expenses",
+          "type": 8
         }
       ],
       "relations": []
@@ -193,16 +203,6 @@
           "id": "2:3806298865076403867",
           "name": "name",
           "type": 9
-        },
-        {
-          "id": "3:8116216442510607606",
-          "name": "defaultRate",
-          "type": 8
-        },
-        {
-          "id": "4:4814155743765217491",
-          "name": "defaultFlatRate",
-          "type": 8
         },
         {
           "id": "5:8368507026526201619",
@@ -313,9 +313,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "10:4252390705396014609",
+      "lastPropertyId": "4:7846805543571907142",
+      "name": "Log",
+      "properties": [
+        {
+          "id": "1:6912409111564926726",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7451840065599665956",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "3:6026119865200888939",
+          "name": "dateCreated",
+          "type": 10
+        },
+        {
+          "id": "4:7846805543571907142",
+          "name": "dbCode",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "9:1886637008793834148",
+  "lastEntityId": "10:4252390705396014609",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -323,7 +352,10 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    8116216442510607606,
+    4814155743765217491
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

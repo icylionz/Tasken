@@ -1,29 +1,18 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tasken/dbms/databasehandler.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:tasken/models/models.dart';
+import 'package:path/path.dart';
 
 void main() async {
-  if (Platform.isWindows || Platform.isLinux) {
-    // Initialize FFI
-    sqfliteFfiInit();
-    // Change the default factory
-    databaseFactory = databaseFactoryFfi;
-  }
-  /* 
-  - Clear the database
-  */
   setUp(() async {
-    List<String> usedTables = ["job_statuses"];
-    for (var table in usedTables) {
-      await TaskenSQLDatabase.delete(table: table);
-    }
+    Directory(join(Directory.current.path, "storage", "mainDB"))
+        .delete(recursive: true);
+    TaskenDatabase.init();
   });
   test("Testing the Database functions - Insert", () async {
-    int? insertTestResult = await TaskenSQLDatabase.insert(
-        table: "job_statuses",
-        values: {"name": "bruh2", "description": "bruh bruh"});
+    int insertTestResult = await TaskenDatabase.insertMain(
+        record: JobType(name: "Rad", description: "bruh"));
     expect(1, insertTestResult);
   });
 }
