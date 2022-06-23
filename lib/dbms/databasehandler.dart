@@ -18,7 +18,6 @@ class TaskenDatabase {
 
   static Future<Store> get mainDB async {
     Directory("storage").create(recursive: true);
-    print("Initializing Main Store");
     mainStore ??= await openStore(directory: join("storage", "mainDB"));
     return mainStore!;
   }

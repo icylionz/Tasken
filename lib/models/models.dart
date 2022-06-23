@@ -1,13 +1,15 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide MenuItem;
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
 import 'package:objectbox/objectbox.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:tasken/Tools/customtools.dart';
 import 'package:tasken/dbms/databasehandler.dart';
+import 'package:tasken/models/settings.dart';
 
 /*@JsonSerializable()*/
 @Entity()
@@ -28,7 +30,8 @@ class Invoice {
       this.currency,
       this.notes,
       this.jobs,
-      this.status,this.taxRate = 0});
+      this.status,
+      this.taxRate = 0});
 
   edit(
       {int? id,
@@ -37,7 +40,8 @@ class Invoice {
       String? currency,
       InvoiceStatus? status,
       List<Job>? jobs,
-      String? notes}) {
+      String? notes,
+      double? taxRate}) {
     id != null ? this.id = id : null;
     name != null ? this.name = name : null;
     dateCreated != null ? this.dateCreated = dateCreated : null;
@@ -45,6 +49,7 @@ class Invoice {
     status != null ? this.status = status : null;
     jobs != null ? this.jobs = jobs : null;
     notes != null ? this.notes = notes : null;
+    taxRate != null ? this.taxRate = taxRate : null;
     save();
   }
 
@@ -77,45 +82,247 @@ class Invoice {
   }
 
   pdf.Document createInvoicePDF() {
-    final invoicePDF = pdf.Document();
+    String missingInfoText = "Not Provided";
+    pdf.ThemeData invoicePDFTheme = pdf.ThemeData(
+        defaultTextStyle: const pdf.TextStyle(fontSize: 15, lineSpacing: 2));
+    pdf.PageTheme invoicePageTheme = pdf.PageTheme(
+        orientation: Settings.orientation,
+        pageFormat: Settings.format,
+        margin: const pdf.EdgeInsets.fromLTRB(20, 10, 20, 10),
+        theme: invoicePDFTheme);
 
+    final invoicePDF = pdf.Document();
+    final client = jobs?.first.client;
+    double totalCost = 0.00;
+    jobs?.forEach((e) => totalCost + e.cost);
+    int totalHours = 0;
+    jobs?.forEach((e) => totalHours + e.timeElapsed);
     invoicePDF.addPage(pdf.Page(
+      pageTheme: invoicePageTheme,
       build: (context) => pdf.Column(children: [
+        //Header
         pdf.SizedBox(
             child: pdf.Row(
+          mainAxisAlignment: pdf.MainAxisAlignment.spaceBetween,
           children: [
-            pdf.Text("INVOICE"),
-            pdf.Image(pdf.MemoryImage(File("")
+            // Logo
+            pdf.Image(pdf.MemoryImage(File("assets/4912-sexy-squirt.png")
                 .readAsBytesSync())), // TODO: Place the logo path from settings
+            pdf.Spacer(),
+            // User Info
+            pdf.Flexible(
+              child: pdf.RichText(
+                  softWrap: true,
+                  text: pdf.TextSpan(children: [
+                    pdf.TextSpan(text: "${Settings.userName}\n"),
+                    pdf.TextSpan(text: "${Settings.address}\n"),
+                    pdf.TextSpan(text: "${Settings.phone}\n"),
+                    pdf.TextSpan(text: "${Settings.email}\n"),
+                    pdf.TextSpan(
+                        style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
+                        text:
+                            "Date: ${DateTime.now().toLocal().year} - ${DateTime.now().toLocal().month} - ${DateTime.now().toLocal().day}"),
+                  ])),
+            )
           ],
         )),
-        pdf.SizedBox(
-            child: pdf.Row(children: [
-          pdf.RichText(
-              // TODO: place company info from settings into spans
-              text: const pdf.TextSpan(children: [
-            pdf.TextSpan(text: ""),
-            pdf.TextSpan(text: ""),
-            pdf.TextSpan(text: ""),
-            pdf.TextSpan(text: ""),
-            pdf.TextSpan(text: ""),
-          ])),
-          pdf.RichText(
-              text: pdf.TextSpan(
+        pdf.Divider(thickness: 0.01, color: PdfColor.fromHex("232323")),
+        // Other Header
+        pdf.Padding(
+          padding: const pdf.EdgeInsets.only(top: 20),
+          child: pdf.SizedBox(
+              child: pdf.Row(
+                  crossAxisAlignment: pdf.CrossAxisAlignment.start,
+                  mainAxisAlignment: pdf.MainAxisAlignment.spaceBetween,
+                  children: [
+                pdf.Flexible(
+                  child: pdf.RichText(
+                      softWrap: true,
+                      text: pdf.TextSpan(children: [
+                        pdf.TextSpan(
+                            text: "Bill to:\n",
+                            style: pdf.TextStyle(
+                                fontWeight: pdf.FontWeight.bold, fontSize: 16)),
+                        pdf.TextSpan(
+                            text:
+                                "${jobs?.first.assignedRepresentative.name}\n"),
+                        pdf.TextSpan(text: "${jobs?.first.client.name}\n"),
+                        pdf.TextSpan(
+                            text:
+                                "${jobs?.first.assignedRepresentative.address}\n"),
+                        pdf.TextSpan(
+                            text:
+                                "${jobs?.first.assignedRepresentative.phone}\n"),
+                        pdf.TextSpan(
+                            text:
+                                "${jobs?.first.assignedRepresentative.email}\n"),
+                      ])),
+                ),
+                pdf.RichText(
+                    text: pdf.TextSpan(
+                  text: "\nInvoice #$id",
                   style: pdf.TextStyle(
+                      fontSize: 30,
                       fontWeight: pdf.FontWeight.bold,
                       decoration: pdf.TextDecoration.underline),
+                ))
+              ])),
+        ),
+        //Table
+        pdf.Padding(
+            padding: pdf.EdgeInsets.only(top: 10, bottom: 10),
+            child: pdf.Table(
+                border: pdf.TableBorder.all(color: PdfColor.fromHex("333333")),
+                defaultVerticalAlignment: pdf.TableCellVerticalAlignment.middle,
+                children: [
+                  // Table Header
+                  pdf.TableRow(
+                      verticalAlignment: pdf.TableCellVerticalAlignment.middle,
+                      children: [
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Job Name",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Job Description",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Hours Completed",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Cost",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                      ]),
+                  //Table Data
+                  pdf.TableRow(children: []),
+                ])),
+        //Subtotal Info
+        pdf.Padding(
+          padding: const pdf.EdgeInsets.only(top: 20),
+          child: pdf.SizedBox(
+              child: pdf.Row(
+                  crossAxisAlignment: pdf.CrossAxisAlignment.start,
+                  mainAxisAlignment: pdf.MainAxisAlignment.end,
                   children: [
-                pdf.TextSpan(
-                    text:
-                        "${DateTime.now().toLocal().year} - ${DateTime.now().toLocal().month} - ${DateTime.now().toLocal().day}"),
-                pdf.TextSpan(text: "Invoice #${id.toString()}")
-              ]))
-        ])),
+                pdf.Flexible(
+                  child: pdf.RichText(
+                      softWrap: true,
+                      // TODO: place financials into spans
+                      text: pdf.TextSpan(
+                          style: pdf.TextStyle(
+                              lineSpacing: 10,
+                              decoration: pdf.TextDecoration.underline),
+                          children: [
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  pdf.TextSpan(text: "Total Hours:   "),
+                                  pdf.TextSpan(text: "${totalHours}"),
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  pdf.TextSpan(text: "\nTax Rate:   "),
+                                  pdf.TextSpan(text: "${taxRate * 100}%"),
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  const pdf.TextSpan(text: "\nTax:   "),
+                                  pdf.TextSpan(
+                                      text: " \$${totalCost * taxRate} "),
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  const pdf.TextSpan(text: "\nBalance Due:   "),
+                                  pdf.TextSpan(
+                                      text:
+                                          " \$${(totalCost) * (1 + taxRate)}"),
+                                ]),
+                          ])),
+                ),
+              ])),
+        ),
+        pdf.Divider(thickness: 0.01, color: PdfColor.fromHex("232323")),
+        //Notes
+        pdf.Padding(
+          padding: const pdf.EdgeInsets.only(top: 20),
+          child: pdf.SizedBox(
+              child: pdf.Row(
+                  crossAxisAlignment: pdf.CrossAxisAlignment.start,
+                  mainAxisAlignment: pdf.MainAxisAlignment.start,
+                  children: [
+                pdf.Flexible(
+                  child: pdf.RichText(
+                      softWrap: true,
+                      // TODO: place financials into spans
+                      text: pdf.TextSpan(children: [
+                        pdf.TextSpan(
+                            style: pdf.TextStyle(
+                                fontSize: 20,
+                                fontWeight: pdf.FontWeight.bold,
+                                lineSpacing: 10,
+                                decoration: pdf.TextDecoration.underline),
+                            text: "Notes:\n"),
+
+                        pdf.TextSpan(
+                            text: "-"), //TODO: insert notes from invoices
+                      ])),
+                ),
+              ])),
+        ),
       ]),
     ));
 
     return invoicePDF;
+  }
+
+  // creates invoices from a list of jobs and separate those that are from different clients
+  static List<Invoice> compileInvoices(List<Job>? incomingJobs) {
+    if (incomingJobs == null) {
+      return [];
+    }
+    //copies the jobs
+    List<Job> jobs = [];
+    jobs.addAll(incomingJobs);
+
+    List<Invoice> invoices = [];
+    while (jobs.isNotEmpty) {
+      // adds the matching jobs into a invoice
+      invoices.add(Invoice(
+          jobs: jobs
+              .where((element) =>
+                  (jobs.first.client == element.client) &&
+                  (jobs.first.assignedRepresentative ==
+                      element.assignedRepresentative))
+              .toList()));
+      // removes the added jobs from the list
+      jobs.removeWhere((element) =>
+          (jobs.first.client == element.client) &&
+          (jobs.first.assignedRepresentative ==
+              element.assignedRepresentative));
+    }
+    return invoices;
   }
 }
 
@@ -154,19 +361,22 @@ class Report {
   DateTime? maxDateAccountFor;
   String? notes;
   List<Job>? jobs = ToMany<Job>();
+  List<Invoice>? invoices = ToMany<Invoice>();
   Report(
       {this.id,
       this.dateCreated,
       this.minDateAccountFor,
       this.maxDateAccountFor,
       this.notes,
-      this.jobs});
+      this.jobs,
+      this.invoices});
   edit(
       {int? id,
       DateTime? dateCreated,
       DateTime? minDateAccountFor,
       DateTime? maxDateAccountFor,
       List<Job>? jobs,
+      List<Invoice>? invoices,
       String? notes}) {
     id != null ? this.id = id : null;
     dateCreated != null ? this.dateCreated = dateCreated : null;
@@ -177,6 +387,7 @@ class Report {
         ? this.maxDateAccountFor = maxDateAccountFor
         : null;
     jobs != null ? this.jobs = jobs : null;
+    invoices != null ? this.invoices = invoices : null;
     notes != null ? this.notes = notes : null;
     save();
   }
@@ -205,16 +416,215 @@ class Report {
     save();
   }
 
+  addInvoices(List<Invoice> invoices) {
+    //Insert
+    invoices.addAll(invoices);
+    save();
+  }
+
+  removeInvoices({List<int>? indexes, List<Invoice>? invoices}) {
+    if (indexes != null) {
+      indexes.map((index) {
+        this.invoices?.removeAt(index);
+      });
+    } else if (invoices != null) {
+      invoices.map((invoice) {
+        this.invoices?.remove(invoice);
+      });
+    }
+    save();
+  }
+
   save() {
     TaskenDatabase.updateMain(record: this);
   }
 
-  pdf.Document createInvoicePDF() {
-    final invoice = pdf.Document();
-    invoice.addPage(pdf.Page(
-      build: (context) => pdf.Column(children: []),
+  pdf.Document createReportPDF() {
+    String missingInfoText = "Not Provided";
+    pdf.ThemeData reportPDFTheme = pdf.ThemeData(
+        defaultTextStyle: const pdf.TextStyle(fontSize: 15, lineSpacing: 2));
+    //TODO: Get PDF settings from settings
+    pdf.PageTheme reportPageTheme = pdf.PageTheme(
+        orientation: pdf.PageOrientation.natural,
+        pageFormat: PdfPageFormat.a4,
+        margin: const pdf.EdgeInsets.fromLTRB(20, 10, 20, 10),
+        theme: reportPDFTheme);
+
+    final reportPDF = pdf.Document();
+    reportPDF.addPage(pdf.Page(
+      pageTheme: reportPageTheme,
+      build: (context) => pdf.Column(children: [
+        //Header
+        pdf.SizedBox(
+            child: pdf.Row(
+          mainAxisAlignment: pdf.MainAxisAlignment.spaceBetween,
+          children: [
+            // Logo
+            pdf.Image(pdf.MemoryImage(File("assets/4912-sexy-squirt.png")
+                .readAsBytesSync())), // TODO: Place the logo path from settings
+            pdf.Spacer(),
+            // User Info
+            pdf.Flexible(
+              child: pdf.RichText(
+                  softWrap: true,
+                  // TODO: place user info into spans
+                  text: pdf.TextSpan(children: [
+                    pdf.TextSpan(text: "fdjafjdajk\n"),
+                    pdf.TextSpan(text: "fdafjkdaf\n"),
+                    pdf.TextSpan(text: "fhjdafljkd\n"),
+                    pdf.TextSpan(
+                        text:
+                            "fdajkfldkafk aflkaj klfakjfdafdakf jdakf adkf lkadfk daflkd alkfjdalkfjlkda klda  klfaldklkfad kldaklfklaxkldas kdaf kladkalkdfkalkff aklkfa\n"),
+                    pdf.TextSpan(text: "klfafka\n"),
+                    pdf.TextSpan(
+                        style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
+                        text:
+                            "Date: ${DateTime.now().toLocal().year} - ${DateTime.now().toLocal().month} - ${DateTime.now().toLocal().day}"),
+                  ])),
+            )
+          ],
+        )),
+        pdf.Divider(thickness: 0.01, color: PdfColor.fromHex("232323")),
+        //Table
+        pdf.Padding(
+            padding: pdf.EdgeInsets.only(top: 10, bottom: 10),
+            child: pdf.Table(
+                border: pdf.TableBorder.all(color: PdfColor.fromHex("333333")),
+                defaultVerticalAlignment: pdf.TableCellVerticalAlignment.middle,
+                children: [
+                  // Table Header
+                  pdf.TableRow(
+                      verticalAlignment: pdf.TableCellVerticalAlignment.middle,
+                      children: [
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Job Name",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Job Description",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Hours Completed",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                        pdf.Padding(
+                            child: pdf.Text(
+                              "Cost",
+                              textAlign: pdf.TextAlign.center,
+                            ),
+                            padding: const pdf.EdgeInsets.all(5)),
+                      ]),
+                  //Table Data
+                  pdf.TableRow(children: []),
+                ])),
+        //Subtotal Info
+        pdf.Padding(
+          padding: const pdf.EdgeInsets.only(top: 20),
+          child: pdf.SizedBox(
+              child: pdf.Row(
+                  crossAxisAlignment: pdf.CrossAxisAlignment.start,
+                  mainAxisAlignment: pdf.MainAxisAlignment.end,
+                  children: [
+                pdf.Flexible(
+                  child: pdf.RichText(
+                      softWrap: true,
+                      // TODO: place financials into spans
+                      text: pdf.TextSpan(
+                          style: pdf.TextStyle(
+                              lineSpacing: 10,
+                              decoration: pdf.TextDecoration.underline),
+                          children: [
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  pdf.TextSpan(text: "Total Hours:   "),
+                                  pdf.TextSpan(
+                                      text:
+                                          " \$- "), //TODO: place calculated hours
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  pdf.TextSpan(text: "\nRate:   "),
+                                  pdf.TextSpan(
+                                      text:
+                                          " \$- "), //TODO: place rate, place hourly if hourly rate
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  pdf.TextSpan(text: "\nTax Rate:   "),
+                                  pdf.TextSpan(
+                                      text: " \$- "), //TODO: place tax rate
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  const pdf.TextSpan(text: "\nTax:   "),
+                                  pdf.TextSpan(
+                                      text:
+                                          " \$- "), //TODO: place calculated tax
+                                ]),
+                            pdf.TextSpan(
+                                style: pdf.TextStyle(
+                                    fontWeight: pdf.FontWeight.bold,
+                                    fontSize: 16),
+                                children: [
+                                  const pdf.TextSpan(text: "\nBalance Due:   "),
+                                  pdf.TextSpan(
+                                      text: " \$- "), //TODO: place balance due
+                                ]),
+                          ])),
+                ),
+              ])),
+        ),
+        pdf.Divider(thickness: 0.01, color: PdfColor.fromHex("232323")),
+        //Notes
+        pdf.Padding(
+          padding: const pdf.EdgeInsets.only(top: 20),
+          child: pdf.SizedBox(
+              child: pdf.Row(
+                  crossAxisAlignment: pdf.CrossAxisAlignment.start,
+                  mainAxisAlignment: pdf.MainAxisAlignment.start,
+                  children: [
+                pdf.Flexible(
+                  child: pdf.RichText(
+                      softWrap: true,
+                      // TODO: place financials into spans
+                      text: pdf.TextSpan(children: [
+                        pdf.TextSpan(
+                            style: pdf.TextStyle(
+                                fontSize: 20,
+                                fontWeight: pdf.FontWeight.bold,
+                                lineSpacing: 10,
+                                decoration: pdf.TextDecoration.underline),
+                            text: "Notes:\n"),
+
+                        pdf.TextSpan(
+                            text: "-"), //TODO: insert notes from reports
+                      ])),
+                ),
+              ])),
+        ),
+      ]),
     ));
-    return invoice;
+
+    return reportPDF;
   }
 }
 
@@ -332,6 +742,7 @@ class Job {
       String? name,
       double? rate,
       double? flatRate,
+      double? expenses,
       bool? useFlatRate,
       DateTime? dateCreated,
       int? inactivityTimeoutPeriod,
@@ -346,6 +757,7 @@ class Job {
     name != null ? this.name = name : null;
     rate != null ? this.rate = rate : null;
     flatRate != null ? this.flatRate = flatRate : null;
+    expenses != null ? this.expenses = expenses : null;
     useFlatRate != null ? this.useFlatRate = useFlatRate : null;
     dateCreated != null ? this.dateCreated = dateCreated : null;
     inactivityTimeoutPeriod != null
@@ -401,7 +813,7 @@ class Job {
     }));
   }
 
-  /* -- Useless until solution found (See clickup task #1vdyabh) 
+  /* TODO:-- Useless until solution found (See clickup task #1vdyabh) 
   _runUpdateTimeLoop(SystemTray systemTray) async {
     print("starting loop");
 
@@ -424,6 +836,21 @@ class Job {
     }
     timerLoopRunning = false;
   } */
+
+  double get timeElapsed {
+    // in hours
+    if (sessions == null) {
+      return 0;
+    }
+    if (sessions!.isEmpty) {
+      return 0;
+    }
+    int elapsed = 0;
+    sessions?.forEach((e) => e.timeElapsed + elapsed);
+    return (elapsed / (1000 * 60 * 60));
+  }
+
+  double get cost => useFlatRate ? flatRate ?? 0 : (rate ?? 0) * timeElapsed;
 }
 
 /*@JsonSerializable()*/
@@ -432,7 +859,7 @@ class Session {
   @Id()
   int? id;
   dynamic job = ToOne<Job>();
-  int timeElapsed = 0;
+  int timeElapsed = 0; // in milliseconds
   @Transient()
   CustomStopwatch? stopwatch;
   DateTime? dateTimeEnded;
@@ -482,7 +909,7 @@ class Session {
   /* Pause Session Timer */
   pauseTimer() {
     stopwatch?.stop();
-
+    timeElapsed = stopwatch?.elapsedMilliseconds ?? 0;
     save();
   }
 
@@ -490,6 +917,7 @@ class Session {
   stopTimer() {
     if (stopwatch!.isRunning) {
       stopwatch?.stop();
+      timeElapsed = stopwatch?.elapsedMilliseconds ?? 0;
       dateTimeEnded = DateTime.now();
     }
     /* Save Session Value */

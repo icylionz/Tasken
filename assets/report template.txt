@@ -1,0 +1,34 @@
+
+
+LOGO										Report ID
+										DateCreated
+
+from-to
+--------------------------------------------------------------------------------------
+
+
+Invoices
+
+id	date	status	clientname	expenses	tax	totalhours	subtotal
+	- jobid		expense		hours		rate
+
+id	date	status	clientname	expenses	tax	totalhours	subtotal
+	- jobid		expense		hours		rate
+
+id	date	status	clientname	expenses	tax	totalhours	subtotal
+	- jobid		expense		hours		rate
+
+
+Total Hours Worked:-
+Total Expenses:-
+Total Tax:-
+Accumulated Income:-
+
+
+
+
+
+		
+	
+
+

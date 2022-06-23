@@ -44,7 +44,7 @@
     },
     {
       "id": "2:2434925613074365961",
-      "lastPropertyId": "6:6477301370766781248",
+      "lastPropertyId": "7:4959659688610860469",
       "name": "Invoice",
       "properties": [
         {
@@ -354,7 +354,8 @@
   "retiredIndexUids": [],
   "retiredPropertyUids": [
     8116216442510607606,
-    4814155743765217491
+    4814155743765217491,
+    4959659688610860469
   ],
   "retiredRelationUids": [],
   "version": 1

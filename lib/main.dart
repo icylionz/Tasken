@@ -1,141 +1,22 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:system_tray/system_tray.dart';
 import 'package:tasken/dbms/databasehandler.dart';
 import 'models/models.dart';
-import 'dart:io';
 import 'package:pdf/widgets.dart' as pdf;
 import 'package:path/path.dart';
 
 Future<void> main() async {
-  pdf.ThemeData invoicePDFTheme = pdf.ThemeData(
-      defaultTextStyle: const pdf.TextStyle(fontSize: 15, lineSpacing: 2));
-  pdf.PageTheme invoicePageTheme = pdf.PageTheme(
-      pageFormat: PdfPageFormat.a4,
-      margin: const pdf.EdgeInsets.fromLTRB(20, 10, 20, 10),
-      theme: invoicePDFTheme);
+  Report reportTest = Report(invoices: [
+    Invoice(jobs: [
+      Job(rate: 10, sessions: [Session(timeElapsed: 20000)]),
+      Job(flatRate: 100,sessions: [Session(timeElapsed: 1000000)])
+    ])
+  ]);
+  pdf.Document reportPDF = reportTest.createReportPDF();
 
-  final invoicePDF = pdf.Document();
-
-  invoicePDF.addPage(pdf.Page(
-    pageTheme: invoicePageTheme,
-    build: (context) => pdf.Column(children: [
-      //Header
-      pdf.SizedBox(
-          child: pdf.Row(
-        mainAxisAlignment: pdf.MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo
-          pdf.Image(pdf.MemoryImage(File("assets/4912-sexy-squirt.png")
-              .readAsBytesSync())), // TODO: Place the logo path from settings
-          pdf.Spacer(),
-          // Client Info
-          pdf.Flexible(
-            child: pdf.RichText(
-                softWrap: true,
-                // TODO: place client info into spans
-                text: pdf.TextSpan(children: [
-                  pdf.TextSpan(text: "fjdahlojf\n"),
-                  pdf.TextSpan(text: "fdafjkdaf\n"),
-                  pdf.TextSpan(text: "fhjdafljkd\n"),
-                  pdf.TextSpan(
-                      text:
-                          "fdajkfldkafk aflkaj klfakjfdafdakf jdakf adkf lkadfk daflkd alkfjdalkfjlkda klda  klfaldklkfad kldaklfklaxkldas kdaf kladkalkdfkalkff aklkfa\n"),
-                  pdf.TextSpan(text: "klfafka\n"),
-                  pdf.TextSpan(
-                      style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
-                      text:
-                          "Date: ${DateTime.now().toLocal().year} - ${DateTime.now().toLocal().month} - ${DateTime.now().toLocal().day}"),
-                ])),
-          )
-        ],
-      )),
-      pdf.Divider(thickness: 0.01, color: PdfColor.fromHex("232323")),
-      // Other Header
-      pdf.Padding(
-        padding: const pdf.EdgeInsets.only(top: 20),
-        child: pdf.SizedBox(
-            child: pdf.Row(
-                crossAxisAlignment: pdf.CrossAxisAlignment.start,
-                mainAxisAlignment: pdf.MainAxisAlignment.spaceBetween,
-                children: [
-              pdf.Flexible(
-                child: pdf.RichText(
-                    softWrap: true,
-                    // TODO: place user info into spans
-                    text: pdf.TextSpan(children: [
-                      pdf.TextSpan(
-                          text: "Bill to:\n",
-                          style: pdf.TextStyle(
-                              fontWeight: pdf.FontWeight.bold, fontSize: 16)),
-                      pdf.TextSpan(text: "fjdahlojf\n"),
-                      pdf.TextSpan(text: "fdafjkdaf\n"),
-                      pdf.TextSpan(text: "fhjdafljkd\n"),
-                      pdf.TextSpan(
-                          text:
-                              "fdajkfldkafk aflkaj klfakjfdafdakf jdakf adkf lkadfk daflkd alkfjdalkfjlkda klda  klfaldklkfad kldaklfklaxkldas kdaf kladkalkdfkalkff aklkfa\n"),
-                      pdf.TextSpan(text: "klfafka\n"),
-                    ])),
-              ),
-              pdf.RichText(
-                  text: pdf.TextSpan(
-                text: "\nInvoice #${1}", // TODO: set to id after testing,
-                style: pdf.TextStyle(
-                    fontSize: 30,
-                    fontWeight: pdf.FontWeight.bold,
-                    decoration: pdf.TextDecoration.underline),
-              ))
-            ])),
-      ),
-      //Table
-      pdf.Padding(
-          padding: pdf.EdgeInsets.only(top: 10, bottom: 10),
-          child: pdf.Table(
-              border: pdf.TableBorder.all(color: PdfColor.fromHex("333333")),
-              defaultVerticalAlignment: pdf.TableCellVerticalAlignment.middle,
-              children: [
-                // Table Header
-                pdf.TableRow(
-                    verticalAlignment: pdf.TableCellVerticalAlignment.middle,
-                    children: [
-                      pdf.Padding(
-                          child: pdf.Text(
-                            "Job Name",
-                            textAlign: pdf.TextAlign.center,
-                          ),
-                          padding: const pdf.EdgeInsets.all(5)),
-                      pdf.Padding(
-                          child: pdf.Text(
-                            "Job Description",
-                            textAlign: pdf.TextAlign.center,
-                          ),
-                          padding: const pdf.EdgeInsets.all(5)),
-                      pdf.Padding(
-                          child: pdf.Text(
-                            "Hours Completed",
-                            textAlign: pdf.TextAlign.center,
-                          ),
-                          padding: const pdf.EdgeInsets.all(5)),
-                      pdf.Padding(
-                          child: pdf.Text(
-                            "Cost",
-                            textAlign: pdf.TextAlign.center,
-                          ),
-                          padding: const pdf.EdgeInsets.all(5)),
-                    ]),
-                //Table Data
-                pdf.TableRow(children: []),
-              ])),
-      //Subtotal Info
-
-      //Notes
-    ]),
-  ));
-
-  File(join("storage", "test.pdf")).writeAsBytesSync(await invoicePDF.save());
+  File(join("storage", "test.pdf")).writeAsBytesSync(await reportPDF.save());
 
   runApp(const MyApp());
   // Initialize DB adapter
